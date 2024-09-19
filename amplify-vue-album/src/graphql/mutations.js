@@ -70,6 +70,7 @@ export const createPhoto = /* GraphQL */ `
       id
       albumID
       name
+      s3key
       createdAt
       updatedAt
       owner
@@ -86,6 +87,7 @@ export const updatePhoto = /* GraphQL */ `
       id
       albumID
       name
+      s3key
       createdAt
       updatedAt
       owner
@@ -102,6 +104,7 @@ export const deletePhoto = /* GraphQL */ `
       id
       albumID
       name
+      s3key
       createdAt
       updatedAt
       owner

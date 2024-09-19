@@ -24,6 +24,8 @@ const dialogContent = ref('')
 
 // メソッドを他のコンポーネントから呼び出せるように公開する
 const openDialog = (content) => {
+  console.log('openDialog content',content);
+  
   dialogContent.value = content
   dialogVisible.value = true
 }

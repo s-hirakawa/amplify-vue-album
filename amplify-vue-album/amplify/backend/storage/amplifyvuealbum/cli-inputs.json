@@ -1,0 +1,12 @@
+{
+  "resourceName": "amplifyvuealbum",
+  "policyUUID": "b0921cb5",
+  "bucketName": "amplify-vue-album",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

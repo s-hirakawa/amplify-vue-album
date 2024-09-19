@@ -1,11 +1,13 @@
 import { createStore } from 'vuex'
 import user from './modules/user'
 import albums from './modules/albums'
+import showstate from './modules/showState'
 
 const store = createStore({
   modules: {
     user,
-    albums
+    albums,
+    showstate
   }
 })
 

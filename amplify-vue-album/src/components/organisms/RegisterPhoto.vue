@@ -7,13 +7,7 @@
         label="Album Name"
         :disabled="isEditAlbumName"
       />
-      <v-img :src="img" max-width="100%" @dragover.prevent @drop="dropFile" />
-      <v-file-input
-        v-model="file"
-        accept="image/png, image/jpeg, image/bmp"
-        hide-input
-        style="display: none;"
-      />
+      
     </template>
     <template v-slot:action>
       <v-btn color="teal-darken-3" variant="outlined" @click="registerImage">Register</v-btn>

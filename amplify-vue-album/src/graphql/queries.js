@@ -1,6 +1,27 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getAlbumWithPhotos = /* GraphQL */ `
+  query GetAlbumWithPhotos($id: ID!) {
+    getAlbum(id: $id) {
+      id
+      name
+      photos {
+        items {
+          id
+          albumID
+          s3key
+          createdAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+
 export const getAlbum = /* GraphQL */ `
   query GetAlbum($id: ID!) {
     getAlbum(id: $id) {
@@ -45,6 +66,7 @@ export const getPhoto = /* GraphQL */ `
       id
       albumID
       name
+      s3key
       createdAt
       updatedAt
       owner
@@ -63,6 +85,7 @@ export const listPhotos = /* GraphQL */ `
         id
         albumID
         name
+        s3key
         createdAt
         updatedAt
         owner
@@ -94,6 +117,7 @@ export const photosByAlbumIDAndId = /* GraphQL */ `
         id
         albumID
         name
+        s3key
         createdAt
         updatedAt
         owner

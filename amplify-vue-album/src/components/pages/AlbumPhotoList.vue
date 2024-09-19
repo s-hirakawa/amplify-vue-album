@@ -3,7 +3,9 @@
     <v-container>
       <v-row>
         <AlbumListHeader
+          :id="album.id"
           :name="album.name"
+          :photos="album.photos"
           :is-album-name-link="false"
           show-detail-controller
         />

@@ -22,39 +22,16 @@
               ></v-text-field>
             </v-col>
 
-            <!-- <v-col
-              cols="12"
-              sm="6"
-            >
-              <v-select
-                :items="['0-17', '18-29', '30-54', '54+']"
-                label="Age*"
-                required
-              ></v-select>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-            >
-              <v-autocomplete
-                :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-                label="Interests"
-                auto-select-first
-                multiple
-              ></v-autocomplete>
-            </v-col> -->
-              <v-col
-              cols="12"
-              >
+              <v-col cols="12">
               <v-file-input
-              :rules="rules"
-              accept="image/png, image/jpeg, image/bmp"
-              label="images"
-              placeholder="Pick an avatar"
-              prepend-icon="mdi-camera"
-              counter
-              multiple
-              show-size
+                accept="image/png, image/jpeg, image/bmp"
+                label="images"
+                placeholder="Pick an avatar"
+                prepend-icon="mdi-camera"
+                @change="onFileChange"
+                counter
+                multiple
+                show-size
               ></v-file-input>
             </v-col>
           </v-row>
@@ -85,11 +62,11 @@
 </template>
 
 <script>
-import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { Amplify } from "aws-amplify";
+import { uploadData } from 'aws-amplify/storage';
 import { generateClient  } from "aws-amplify/api";
-import { createAlbum } from "../../graphql/mutations";
+import { createAlbum ,createPhoto} from "../../graphql/mutations";
 import config from  '@/aws-exports';
 
 Amplify.configure(config);
@@ -101,44 +78,87 @@ async function CloseModal() {
   // this.dialog = false
 
   }
+  export default {
+    data: () => ({
+      CloseModal,
+      dialog: false,
+      Albumname: '',
+      albumId:'',
+      store : useStore(),
+      s3key: "",
+      image: null,
+      
+    }),
+    methods: {
+      onFileChange(e) {
+        this.image = e.target.files;
+      },
+      async submit(){
+        console.log('push submit');
+        console.log('this.Albumname',this.Albumname);
 
-export default {
-  data: () => ({
-    CloseModal,
-    dialog: false,
-    Albumname: '',
-    albumId:'',
-    store : useStore(),
+        const input = {
+          userId: this.store.getters['user/getUserInfo'].id,
+          name: this.Albumname,
+        }
+        console.log('input',input);
 
-  }),
-  methods: {
-    async submit(){
-      console.log('push submit');
-      console.log('this.Albumname',this.Albumname);
-      const input = {
-        userId: this.store.getters['user/getUserInfo'].id,
-        name: this.Albumname,
-      }
-      console.log('input',input);
-      await API.graphql({
-      query: createAlbum,
-      variables: { input },
-    })
-      .then((result) => {
-        console.log('result',result);
-        console.log('result',result.data.createAlbum.id);
-        this.albumId = result.data.createAlbum.id
-        console.log(this.albumId);
-        // storeにアルバムを追加
-        this.store.dispatch(
-        'albums/createAlbum',
-        { id: this.albumId, name: this.Albumname, photos: [1]}
-      )
-        // this.$router.push({ name: "AlbumIndex" });
-      })
-      .catch((error) => {
-        console.log('error',error);
-      });
+        // アルバムの作成
+        await API.graphql({
+          query: createAlbum,
+          variables: { input },
+          })
+          .then((result) => {
+            console.log('createAlbum result',result);
+            this.albumId = result.data.createAlbum.id
+            console.log(this.albumId);
+            // storeにアルバムを追加
+            this.store.dispatch(
+            'albums/createAlbum',
+            { id: this.albumId, name: this.Albumname, photos: [1]}
+          )
+            // this.$router.push({ name: "AlbumIndex" });
+          })
+          .catch((error) => {
+            console.log('createAlbum error',error);
+        });
+        
+        //imeageがUPされていれば実行
+        if (this.image) {
+          console.log('写真登録あり');
+          for (let img of this.image) {
+            const s3key = new Date().getTime().toString(16) + img.name;
+            // 写真のアップロード
+            try {
+              const result = await uploadData({
+                path: s3key, 
+                data: img,
+              }).result;
+                console.log('uploadData Succeeded: ', result);
+              } catch (error) {
+                console.log('uploadData Error : ', error);
+              }
+            const input = {
+              albumID: this.albumId,
+              name: img.name,
+              s3key : s3key,
+            }
+            // 写真テーブルの追加
+            await API.graphql({
+              query: createPhoto,
+              variables: { input },
+              }).then((result) => {
+                console.log('createPhot result',result);
+              }).catch((error) => {
+                console.log('createPhot error',error);
+            });
+          }
+        }
+        else {
+          console.log('写真登録なし');
+        }
+
+
     }
   },
 }

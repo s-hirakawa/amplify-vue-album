@@ -1,7 +1,11 @@
 /* eslint-disable */
 <template>
   <v-app-bar>
-    <v-app-bar-title>Application</v-app-bar-title>
+    <v-app-bar-title>AlbumPhoto
+      <v-btn  v-if="auth.authStatus === 'authenticated'"  class="ma-2" color="orange-darken-2" @click="$router.back()">
+        <v-icon icon="mdi-arrow-left" start></v-icon>Back
+      </v-btn>
+    </v-app-bar-title>
     <v-spacer></v-spacer>
     <v-btn v-if="auth.authStatus === 'authenticated'"  @click="auth.signOut" to="/signin">Sign out</v-btn>
     <v-btn v-if="userName" prepend-icon="mdi-account">{{userName}}</v-btn>
